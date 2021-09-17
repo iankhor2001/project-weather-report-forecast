@@ -9,6 +9,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 // import Container from 'react-bootstrap/Container';
 
+import Today from './Today';
 import './App.css';
 
 export class App extends React.Component {
@@ -41,7 +42,7 @@ export class App extends React.Component {
                 </div>
                 <Switch>
                     <Route exact path="/">
-                        Home
+                        <Today unit={this.state.unit} onUnitChange={this.handleUnitChange} />
                     </Route>
                     <Route path="/forecast">
                         Forecast
