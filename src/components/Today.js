@@ -1,5 +1,7 @@
 import React from 'react';
-// import {getWeather} from 'api/open-weather-map.js';
+import {getTodayWeather, cancelWeather} from 'api/open-weather-map';
+
+import TodayWeatherDisplay from './TodayWeatherDisplay';
 
 export default class Today extends React.Component {
     static getInitWeatherState() { 
@@ -28,7 +30,7 @@ export default class Today extends React.Component {
         return (
             <div className={`today weather-bg ${this.state.group}`}>
                 <div className={`mask ${this.state.masking ? 'masking' : ''}`}>
-                    {/* WeatherDisplay */}
+                    <TodayWeatherDisplay {...this.state}/>
                     {/* WeatherForm */}
                     Hello Today
                 </div>
@@ -41,35 +43,35 @@ export default class Today extends React.Component {
     }
 
     componentWillUnmount() {
-        // this.state.loading && cancelWeather();
+        this.state.loading && cancelWeather();
     }
 
     getWeather(city, unit) { 
-        // this.setState({
-        //     loading: true,
-        //     masking: true,
-        //     city: city
-        // }, () => {
-        //     getWeather(city, unit).then(weather => {
-        //         this.setState({
-        //             ...weather,
-        //             loading: false,
-        //         }, () => this.notifyUnitChange(unit));
-        //     }).catch(err => {
-        //         console.error('Error getting weather', err);
+        this.setState({
+            loading: true,
+            masking: true,
+            city: city
+        }, () => {
+            getTodayWeather(city, unit).then(weather => {
+                this.setState({
+                    ...weather,
+                    loading: false,
+                }, () => this.notifyUnitChange(unit));
+            }).catch(err => {
+                console.error('Error getting weather', err);
 
-        //         this.setState({
-        //             ...Today.getInitWeatherState(unit),
-        //             loading: false,
-        //         }, () => this.notifyUnitChange(unit));
-        //     });
-        // });
+                this.setState({
+                    ...Today.getInitWeatherState(unit),
+                    loading: false,
+                }, () => this.notifyUnitChange(unit));
+            });
+        });
 
-        // setTimeout(() => {
-        //     this.setState({
-        //         masking: false
-        //     });
-        // }, 600);
+        setTimeout(() => {
+            this.setState({
+                masking: false
+            });
+        }, 600);
     }
 
     handleFormQuery(city, unit) {
