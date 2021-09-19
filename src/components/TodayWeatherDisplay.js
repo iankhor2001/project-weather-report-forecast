@@ -21,7 +21,7 @@ export default class TodayWeatherDisplay extends React.Component {
                 <img src={require(`images/w-${this.props.group}.png`).default}/>
                 <p className='description'>{this.props.description}</p>&nbsp;
                 <h1 className='temp'>
-                    <span className='display-3'>{this.props.temp.toFixed(0)}&ordm;</span>
+                    <span className='display-3'>{this.props.temp.toFixed(1)}&ordm;</span>
                     &nbsp;
                     {(this.props.unit === 'metric') ? 'C' : 'F'}
                 </h1>
