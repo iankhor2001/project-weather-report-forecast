@@ -20,10 +20,11 @@ export default class TodayWeatherForm extends React.Component {
             tempToggle: false,
             unit: props.unit
         };
-
+        this.autocomplete = null;
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleUnitChange = this.handleUnitChange.bind(this);
+        this.handleAutocompleteChange = this.handleAutocompleteChange.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -31,6 +32,15 @@ export default class TodayWeatherForm extends React.Component {
             inputValue: nextProps.city,
             unit: nextProps.unit
         });
+    }
+
+    componentDidMount() {
+        this.autocomplete = new google.maps.places.Autocomplete(document.getElementById('location-autocomplete'), {});
+        this.autocomplete.setOptions({
+            types: ['(cities)'],  // set types to only autocomplete Cities
+            fields: ['formatted_address']  // set field to only get formatted_address
+        })
+        this.autocomplete.addListener("place_changed", this.handleAutocompleteChange);
     }
 
     render() {
@@ -42,7 +52,7 @@ export default class TodayWeatherForm extends React.Component {
                             <Form.Control
                                 type='text' 
                                 name='city' 
-                                // innerRef={element => {this.inputElement = element}} 
+                                id='location-autocomplete'
                                 value={this.state.inputValue}
                                 onChange={this.handleInputChange} 
                             />
@@ -64,9 +74,15 @@ export default class TodayWeatherForm extends React.Component {
     }
 
     handleInputChange(element) {
-        console.log(element.target.value)
         this.setState({
             inputValue: element.target.value
+        })
+    }
+
+    handleAutocompleteChange() {
+        const cityObject = this.autocomplete.getPlace();
+        this.setState({
+            inputValue: String(cityObject.formatted_address)
         })
     }
 
@@ -74,7 +90,8 @@ export default class TodayWeatherForm extends React.Component {
         element.preventDefault();
         console.log('submit'+this.state.inputValue)
         if (this.state.inputValue && this.state.inputValue.trim()) {
-            this.props.onQuery(this.state.inputValue, this.state.unit);
+            const location = this.state.inputValue.replace(' ', '');
+            this.props.onQuery(location, this.state.unit);
         } else {
             this.state.inputElement = this.props.city;
         }
