@@ -44,7 +44,38 @@ export function getTodayWeather(city, unit) {
                 group: getWeatherGroup(res.data.weather[0].id),
                 description: res.data.weather[0].description,
                 temp: res.data.main.temp,
-                unit: unit // or 'imperial'
+                unit: unit
+            };
+        }
+    }).catch(function(err) {
+        if (axios.isCancel(err)) {
+            console.error(err.message, err);
+        } else {
+            throw err;
+        }
+    });
+}
+
+export function getGeolocationWeather(lat, lon, unit) {
+    // window.navigator.geolocation.getCurrentPosition((returnPosition)=>{logReturnPositon(returnPosition)}, (err)=>{throw err;});
+    
+    console.log('lat: '+lat);
+    var url = `${baseUrl}&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&units=${unit}`;
+
+    console.log(`Making request to: ${url}`);
+
+    return axios.get(url, {cancelToken: weatherSource.token}).then(function(res) {
+        if (res.data.cod && res.data.message) {
+            throw new Error(res.data.message);
+        } else {
+            return {
+                city: res.data.name,
+                currentLocation: res.data.name,
+                code: res.data.weather[0].id,
+                group: getWeatherGroup(res.data.weather[0].id),
+                description: res.data.weather[0].description,
+                temp: res.data.main.temp,
+                unit: unit
             };
         }
     }).catch(function(err) {
