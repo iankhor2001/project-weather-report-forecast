@@ -3,6 +3,7 @@ import {getTodayWeather, getGeolocationWeather, cancelWeather} from 'api/open-we
 
 import TodayWeatherDisplay from './TodayWeatherDisplay';
 import TodayWeatherForm from './TodayWeatherForm';
+import Button from 'react-bootstrap/Button';
 
 export default class Today extends React.Component {
     static getInitWeatherState() { 
@@ -37,7 +38,9 @@ export default class Today extends React.Component {
                         city={this.state.city} 
                         unit={this.props.unit} 
                         onQuery={this.handleFormQuery}
+                        getGeoWeather={this.getGeolocationWeather}
                     />
+                    <Button onClick={() => this.getGeolocationWeather(this.props.unit)}>Get Current Location Weather</Button>
                     Hello Today
                 </div>
             </div>
