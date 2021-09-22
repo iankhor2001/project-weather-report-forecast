@@ -40,8 +40,7 @@ export default class Today extends React.Component {
                         onQuery={this.handleFormQuery}
                         getGeoWeather={this.getGeolocationWeather}
                     />
-                    <Button onClick={() => this.getGeolocationWeather(this.props.unit)}>Get Current Location Weather</Button>
-                    Hello Today
+                    <Button onClick={() => this.getGeolocationWeather(this.props.unit)}>Get Current Location Weather</Button>   {/*Show Weather at my current location */}
                 </div>
             </div>
         )

@@ -42,7 +42,7 @@ export function getTodayWeather(city, unit) {
                 city: capitalize(city),
                 code: res.data.weather[0].id,
                 group: getWeatherGroup(res.data.weather[0].id),
-                description: res.data.weather[0].description,
+                description: capitalize(res.data.weather[0].description),
                 temp: res.data.main.temp,
                 unit: unit
             };
@@ -73,7 +73,7 @@ export function getGeolocationWeather(lat, lon, unit) {
                 currentLocation: res.data.name,
                 code: res.data.weather[0].id,
                 group: getWeatherGroup(res.data.weather[0].id),
-                description: res.data.weather[0].description,
+                description: capitalize(res.data.weather[0].description),
                 temp: res.data.main.temp,
                 unit: unit
             };
