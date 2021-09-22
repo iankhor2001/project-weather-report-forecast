@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
@@ -66,5 +67,9 @@ module.exports = {
             }
         ]
     },
-    plugins: [new MiniCssExtractPlugin()],
+    devtool: false,
+    plugins: [
+        new MiniCssExtractPlugin(),
+        new webpack.SourceMapDevToolPlugin({})
+    ],
 };
