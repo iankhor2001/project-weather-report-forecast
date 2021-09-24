@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import Stack from 'react-bootstrap/Stack';
 
 export default class TodayWeatherForm extends React.Component {
     static propTypes = {
@@ -45,29 +44,35 @@ export default class TodayWeatherForm extends React.Component {
 
     render() {
         return (
-            <div className='weather-form'>
-                <Form onSubmit={this.handleSubmit} className='form-inline justify-content-center'>
-                    <Row>
-                        <Col>
-                            <Form.Control
-                                type='text' 
-                                name='city' 
-                                id='location-autocomplete'
-                                value={this.state.inputValue}
-                                onChange={this.handleInputChange} 
-                            />
-                        </Col>
-                        <Col>
-                            <Form.Select
-                                aria-label='TodayTempUnitSelect'
-                                onChange={this.handleUnitChange}
-                            >
-                                <option value='C'>&ordm; C</option>
-                                <option value='F'>&ordm; F</option>
-                            </Form.Select>
-                        </Col>
-                        <Col><Button type='submit'>Submit</Button></Col>
-                    </Row>
+            <div className='weather-form py-5 container'>
+                <Form onSubmit={this.handleSubmit} className='form-inline justify-content-center px-3'>
+                    <Stack direction='horizontal' gap={3}>
+                        <Form.Control 
+                            className='px-4'
+                            size='lg'
+                            type='text' 
+                            name='city' 
+                            id='location-autocomplete'
+                            value={this.state.inputValue}
+                            onChange={this.handleInputChange} 
+                        />
+                        <Form.Select
+                            size='lg'
+                            className='w-auto'
+                            aria-label='TodayTempUnitSelect'
+                            onChange={this.handleUnitChange}
+                        >
+                            <option value='C'>&ordm; C</option>
+                            <option value='F'>&ordm; F</option>
+                        </Form.Select>
+                        <div className="vr" />
+                        <Button 
+                            type='submit'
+                            size='lg'
+                        >
+                            Submit
+                        </Button>
+                    </Stack>
                 </Form>
             </div>
         )

@@ -37,15 +37,14 @@ export default class Today extends React.Component {
         return (
             <div className={`today weather-bg ${this.state.group}`}>
                 <div className={`mask ${this.state.masking ? 'masking' : ''}`}>
-                    <TodayWeatherDisplay {...this.state}/>
                     <TodayWeatherForm 
                         city={this.state.city} 
                         unit={this.props.unit} 
                         onQuery={this.handleFormQuery}
                         getGeoWeather={this.getGeolocationWeather}
                     />
+                    <TodayWeatherDisplay {...this.state}/>
                     <Button onClick={() => this.getGeolocationWeather(this.props.unit)}>Get Current Location Weather</Button>   {/*Show Weather at my current location */}
-                    
                     <Modal 
                         show={this.state.showGetWeatherError} 
                         onHide={this.handleCloseWeatherError}
