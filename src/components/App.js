@@ -11,6 +11,7 @@ import Nav from 'react-bootstrap/Nav';
 
 import Today from './Today';
 import './App.css';
+import './Theme.css';
 
 export class App extends React.Component {
     constructor(props) {
