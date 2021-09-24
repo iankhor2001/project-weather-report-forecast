@@ -31,15 +31,17 @@ let weatherSource = axios.CancelToken.source();
 
 export function getTodayWeather(city, unit) {
     var url = `${baseUrl}&q=${encodeURIComponent(city)}&units=${unit}`;
-
     console.log(`Making request to: ${url}`);
+    var requestTime = new Date().toLocaleTimeString();
 
     return axios.get(url, {cancelToken: weatherSource.token}).then(function(res) {
         if (res.data.cod && res.data.message) {
             throw new Error(res.data.message);
         } else {
             return {
-                city: capitalize(city),
+                requestTime: requestTime,
+                city: capitalize(city.replace(',', ', ')),
+                country: res.data.sys.country,
                 code: res.data.weather[0].id,
                 group: getWeatherGroup(res.data.weather[0].id),
                 description: capitalize(res.data.weather[0].description),
@@ -61,15 +63,18 @@ export function getGeolocationWeather(lat, lon, unit) {
     
     console.log('lat: '+lat);
     var url = `${baseUrl}&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&units=${unit}`;
-
+    var requestTime = new Date().toLocaleTimeString();
     console.log(`Making request to: ${url}`);
 
     return axios.get(url, {cancelToken: weatherSource.token}).then(function(res) {
         if (res.data.cod && res.data.message) {
             throw new Error(res.data.message);
         } else {
+            console.log(res)
             return {
+                requestTime: requestTime,
                 city: res.data.name,
+                country: res.data.sys.country,
                 currentLocation: res.data.name,
                 code: res.data.weather[0].id,
                 group: getWeatherGroup(res.data.weather[0].id),
