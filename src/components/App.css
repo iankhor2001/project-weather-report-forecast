@@ -4,5 +4,16 @@
 }
 
 .weather-body {
-    min-height: calc(100vh - 10rem);
+    min-height: calc(100vh - 11.25rem);
+}
+
+
+.nav-link.app-nav-link {
+    border-top: 0.125rem solid #03045E;
+    border-bottom: 0.125rem solid #03045E;
+    padding-bottom: 0.375rem;
+}
+
+.nav-link.app-nav-link:hover {
+    border-bottom-color: #FFF;
 }

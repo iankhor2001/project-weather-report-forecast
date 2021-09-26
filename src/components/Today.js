@@ -31,6 +31,7 @@ export default class Today extends React.Component {
         this.handleFormQuery = this.handleFormQuery.bind(this);
         this.handleCloseWeatherError = this.handleCloseWeatherError.bind(this);
         this.handleShowWeatherError = this.handleShowWeatherError.bind(this);
+        this.handleGetGeolocationWeather = this.handleGetGeolocationWeather.bind(this);
     }
 
     render() {
@@ -41,7 +42,7 @@ export default class Today extends React.Component {
                         city={this.state.city} 
                         unit={this.props.unit} 
                         onQuery={this.handleFormQuery}
-                        getGeoWeather={this.getGeolocationWeather}
+                        getGeoWeather={this.handleGetGeolocationWeather}
                     />
                     <TodayWeatherDisplay {...this.state}/>
                     <Button onClick={() => this.getGeolocationWeather(this.props.unit)}>Get Current Location Weather</Button>   {/*Show Weather at my current location */}
@@ -151,6 +152,10 @@ export default class Today extends React.Component {
 
     handleFormQuery(city, unit) {
         this.getWeather(city, unit);
+    }
+
+    handleGetGeolocationWeather(unit) {
+        this.getGeolocationWeather(unit);
     }
 
     notifyUnitChange(unit) {

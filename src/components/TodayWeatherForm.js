@@ -93,7 +93,6 @@ export default class TodayWeatherForm extends React.Component {
 
     handleSubmit(element) {
         element.preventDefault();
-        console.log('submit'+this.state.inputValue)
         if (this.state.inputValue && this.state.inputValue.trim()) {
             const location = this.state.inputValue.replace(', ', ',');
             this.props.onQuery(location, this.state.unit);

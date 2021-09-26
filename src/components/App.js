@@ -28,14 +28,14 @@ export class App extends React.Component {
         return (
             <Router>
                 <div className={`app-navbar bg-faded ${this.state.group}`}>
-                    <Navbar bg="light">
+                    <Navbar variant="dark">
                         <div className="container">
                             <Navbar.Brand className="navbar-brand">Weather Forecast</Navbar.Brand>
                             <Navbar.Toggle aria-controls="navbar-content"/>
                             <Navbar.Collapse id="navbar-content">
                                 <Nav className="me-auto">
-                                    <Nav.Link as={Link} eventKey="home" to="/">Home</Nav.Link>
-                                    <Nav.Link as={Link} eventKey="forecast" to="/forecast">Forecast</Nav.Link>
+                                    <Nav.Link as={Link} className='app-nav-link' eventKey="home" to="/">Home</Nav.Link>
+                                    <Nav.Link as={Link} className='app-nav-link' eventKey="forecast" to="/forecast">Forecast</Nav.Link>
                                 </Nav>
                                 <span className="navbar-text ml-auto">Ian Khor</span>
                             </Navbar.Collapse>

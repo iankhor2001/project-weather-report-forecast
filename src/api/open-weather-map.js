@@ -61,7 +61,6 @@ export function getTodayWeather(city, unit) {
 export function getGeolocationWeather(lat, lon, unit) {
     // window.navigator.geolocation.getCurrentPosition((returnPosition)=>{logReturnPositon(returnPosition)}, (err)=>{throw err;});
     
-    console.log('lat: '+lat);
     var url = `${baseUrl}&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&units=${unit}`;
     var requestTime = new Date().toLocaleTimeString();
     console.log(`Making request to: ${url}`);
@@ -70,7 +69,7 @@ export function getGeolocationWeather(lat, lon, unit) {
         if (res.data.cod && res.data.message) {
             throw new Error(res.data.message);
         } else {
-            console.log(res)
+            // console.log(res)
             return {
                 requestTime: requestTime,
                 city: res.data.name,

@@ -2,3 +2,21 @@
     padding-left: 4rem;
     padding-right: 4rem;
 }
+@media (min-width: 1080px) {
+    .container {
+        max-width: 1080px;
+    }
+}
+
+body {
+    background: rgb(0,150,199);
+    background: linear-gradient(0deg, rgba(0,150,199,1) 0%, rgba(2,62,138,1) 100%);
+}
+
+.app-navbar {
+    background-color: #03045E;
+}
+
+.card {
+    border-radius: 0.5rem;
+}
