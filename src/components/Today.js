@@ -45,7 +45,6 @@ export default class Today extends React.Component {
                         getGeoWeather={this.handleGetGeolocationWeather}
                     />
                     <TodayWeatherDisplay {...this.state}/>
-                    <Button onClick={() => this.getGeolocationWeather(this.props.unit)}>Get Current Location Weather</Button>   {/*Show Weather at my current location */}
                     <Modal 
                         show={this.state.showGetWeatherError} 
                         onHide={this.handleCloseWeatherError}
