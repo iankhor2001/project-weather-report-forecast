@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import Stack from 'react-bootstrap/Stack';
+import Stack from 'react-bootstrap/Stack'; 
 
 export default class TodayWeatherForm extends React.Component {
     static propTypes = {
@@ -46,31 +46,73 @@ export default class TodayWeatherForm extends React.Component {
         return (
             <div className='weather-form py-5 container'>
                 <Form onSubmit={this.handleSubmit} className='form-inline justify-content-center px-3'>
+                    <Form.Control 
+                        className='px-4'
+                        type='text' 
+                        name='city' 
+                        className='d-sm-none mb-2' 
+                        id='location-autocomplete'
+                        value={this.state.inputValue}
+                        onChange={this.handleInputChange} 
+                    />
                     <Stack direction='horizontal' gap={3}>
-                        <Form.Control 
-                            className='px-4'
-                            size='lg'
-                            type='text' 
-                            name='city' 
-                            id='location-autocomplete'
-                            value={this.state.inputValue}
-                            onChange={this.handleInputChange} 
-                        />
                         <Form.Select
-                            size='lg'
-                            className='w-auto'
+                            className='ms-auto w-auto d-sm-none' 
                             aria-label='TodayTempUnitSelect'
                             onChange={this.handleUnitChange}
                         >
                             <option value='C'>&ordm; C</option>
                             <option value='F'>&ordm; F</option>
                         </Form.Select>
-                        <div className="vr" />
+                        <Button 
+                            type='submit'
+                            className='d-sm-none' 
+                        >
+                            Submit
+                        </Button>
+                        <Button 
+                            onClick={() => this.props.getGeoWeather(this.props.unit)}
+                            className='d-sm-none me-auto' 
+                        >
+                            Current&nbsp;Location
+                        </Button>
+                    </Stack>
+
+                    <Stack direction='horizontal' gap={3}>
+                        <Form.Control 
+                            className='px-4'
+                            size='lg'
+                            type='text' 
+                            name='city' 
+                            className='d-none d-sm-block' 
+                            id='location-autocomplete'
+                            value={this.state.inputValue}
+                            onChange={this.handleInputChange} 
+                        />
+                        <Form.Select
+                            size='lg'
+                            className='w-auto d-none d-sm-block'
+                            aria-label='TodayTempUnitSelect'
+                            onChange={this.handleUnitChange}
+                        >
+                            <option value='C'>&ordm; C</option>
+                            <option value='F'>&ordm; F</option>
+                        </Form.Select>
+                        <div className="vr vr-weather-form d-none d-sm-block" />
                         <Button 
                             type='submit'
                             size='lg'
+                            className='d-none d-sm-block' 
                         >
                             Submit
+                        </Button>
+                        <div className="vr vr-weather-form d-none d-sm-block" />
+                        <Button 
+                            onClick={() => this.props.getGeoWeather(this.props.unit)}
+                            size='lg'
+                            className='d-none d-sm-block' 
+                        >
+                            Current&nbsp;Location
                         </Button>
                     </Stack>
                 </Form>

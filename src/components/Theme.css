@@ -20,3 +20,7 @@ body {
 .card {
     border-radius: 0.5rem;
 }
+
+.vr.vr-weather-form {
+    color: #FFF;
+}
