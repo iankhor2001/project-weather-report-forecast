@@ -2,6 +2,10 @@ import axios from 'axios';
 
 const key = 'ecad5734e51e8f8b8441eceb76606453';
 const baseUrl = `http://api.openweathermap.org/data/2.5/weather?appid=${key}`;
+const baseGeocodingUrl = `http://api.openweathermap.org/geo/1.0/direct?appid=${key}`;
+const baseWeatherUrl = `http://api.openweathermap.org/data/2.5/onecall?appid=${key}`;
+
+const excludeField = ['minutely', 'hourly', 'daily', 'alert']
 
 export function getWeatherGroup(code) {
     let group = 'na';
@@ -30,32 +34,55 @@ export function capitalize(string) {
 let weatherSource = axios.CancelToken.source();
 
 export function getTodayWeather(city, unit) {
-    var url = `${baseUrl}&q=${encodeURIComponent(city)}&units=${unit}`;
-    console.log(`Making request to: ${url}`);
+    var geocodingUrl = `${baseGeocodingUrl}&q=${encodeURIComponent(city)}&limit=1`;
+    var baseOneCallUrl = `${baseWeatherUrl}&exclude=${excludeField.join(',')}`;
+    console.log(`Making request to: ${geocodingUrl}`);
     var requestTime = new Date().toLocaleTimeString();
 
-    return axios.get(url, {cancelToken: weatherSource.token}).then(function(res) {
+    return axios.get(geocodingUrl, {cancelToken: weatherSource.token}
+        ).then(function(res) {
         if (res.data.cod && res.data.message) {
+            debugger;
             throw new Error(res.data.message);
         } else {
             return {
-                requestTime: requestTime,
-                city: capitalize(city.replace(',', ', ')),
-                country: res.data.sys.country,
-                code: res.data.weather[0].id,
-                group: getWeatherGroup(res.data.weather[0].id),
-                description: capitalize(res.data.weather[0].description),
-                temp: res.data.main.temp,
-                unit: unit
-            };
-        }
-    }).catch(function(err) {
-        if (axios.isCancel(err)) {
-            console.error(err.message, err);
-        } else {
-            throw err;
-        }
-    });
+                lat: res.data[0].lat,
+                lon: res.data[0].lon,
+                country: res.data[0].country
+                }
+            }
+        }).then(function(res) {
+            console.log(`Get coordinate successful, requesting ${res.lat},${res.lon}`);
+            const oneCallUrl = `${baseOneCallUrl}&lat=${res.lat}&lon=${res.lon}&unit=${unit}`;
+            console.log(`Making request to: ${oneCallUrl}`);
+            return axios.get(oneCallUrl, {cancelToken: weatherSource.token}).then(function(oneCallRes) {
+                if (oneCallRes.data.cod && oneCallRes.data.message) {
+                    debugger;
+                    throw new Error(oneCallRes.data.message);
+                } else {
+                    console.log(oneCallRes)
+                    return {
+                            requestTime: requestTime,
+                            city: capitalize(city.replace(',', ', ')),
+                            country: res.country,
+                            code: oneCallRes.data.current.weather[0].id,
+                            group: getWeatherGroup(oneCallRes.data.current.weather[0].id),
+                            description: capitalize(oneCallRes.data.current.weather[0].description),
+                            temp: oneCallRes.data.current.temp,
+                            unit: unit
+                        };
+                };
+            });
+        }).catch(function(err) {
+            if (axios.isCancel(err)) {
+                console.error(err.message, err);
+            } else {
+                debugger;
+                throw err;
+            }
+            debugger;
+            
+        });
 }
 
 export function getGeolocationWeather(lat, lon, unit) {
