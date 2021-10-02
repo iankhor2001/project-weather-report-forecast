@@ -3,6 +3,7 @@ import axios from 'axios';
 const key = 'ecad5734e51e8f8b8441eceb76606453';
 // const baseUrl = `http://api.openweathermap.org/data/2.5/weather?appid=${key}`;
 const baseGeocodingUrl = `http://api.openweathermap.org/geo/1.0/direct?appid=${key}`;
+const baseReverseGeocodingUrl = `http://api.openweathermap.org/geo/1.0/reverse?appid=${key}`;
 const baseWeatherUrl = `http://api.openweathermap.org/data/2.5/onecall?appid=${key}`;
 
 const excludeField = ['minutely', 'hourly', 'daily', 'alert']
@@ -110,34 +111,70 @@ export function getTodayWeather(city, unit) {
 }
 
 export function getGeolocationWeather(lat, lon, unit) {
-    var url = `${baseWeatherUrl}&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&units=${unit}`;
-    var requestTime = new Date().toLocaleTimeString();
-    console.log(`Making request to: ${url}`);
+    const oneCallUrl = `${baseWeatherUrl}&lat=${lat}&lon=${lon}&units=${unit}&exclude=${excludeField.join(',')}`;
 
-    return axios.get(url, {cancelToken: weatherSource.token}).then(function(res) {
-        if (res.data.cod && res.data.message) {
-            throw new Error(res.data.message);
+    var reverseGeocodingUrl = `${baseReverseGeocodingUrl}&lat=${lat}&lon=${lon}&limit=1`;
+    console.log(`Making request to: ${reverseGeocodingUrl}`);
+
+    return axios.get(reverseGeocodingUrl, {cancelToken: weatherSource.token}
+        ).then(function(geocodingRes) {
+        if (geocodingRes.data.cod && geocodingRes.data.message) {
+            debugger;
+            throw new Error(geocodingRes.data.message);
         } else {
-            // console.log(res)
             return {
-                requestTime: requestTime,
-                city: res.data.name,
-                country: res.data.sys.country,
-                currentLocation: res.data.name,
-                code: res.data.weather[0].id,
-                group: getWeatherGroup(res.data.weather[0].id),
-                description: capitalize(res.data.weather[0].description),
-                temp: res.data.main.temp,
-                unit: unit
-            };
-        }
-    }).catch(function(err) {
-        if (axios.isCancel(err)) {
-            console.error(err.message, err);
-        } else {
-            throw err;
-        }
-    });
+                city: geocodingRes.data[0].name,
+                country: geocodingRes.data[0].country,
+                }
+            }
+        }).then(function(locationData) {
+            console.log(`Get coordinate successful, requesting ${lat},${lon}`);
+            console.log(`Making request to: ${oneCallUrl}`);
+            return axios.get(oneCallUrl, {cancelToken: weatherSource.token}).then(function(oneCallRes) {
+                if (oneCallRes.data.cod && oneCallRes.data.message) {
+                    debugger;
+                    throw new Error(oneCallRes.data.message);
+                } else {
+                    console.log(oneCallRes)
+                    let timezoneOffset = oneCallRes.data.timezone_offset;
+                    let furtherCurrentInfo = {
+                        sunrise: getLocalTime(oneCallRes.data.current.sunrise, timezoneOffset),
+                        sunset: getLocalTime(oneCallRes.data.current.sunset, timezoneOffset),
+                        feelsLike: oneCallRes.data.current.feels_like,
+                        pressure: oneCallRes.data.current.pressure,  // Atmospheric pressure on the sea level, hPa
+                        humidity: oneCallRes.data.current.humidity,  // %
+                        dewPoint: oneCallRes.data.current.dew_point, // Atmospheric temperature below which water droplets begin to condense
+                        clouds: oneCallRes.data.current.clouds,  // cloudiness, %
+                        uvi: oneCallRes.data.current.uvi,  // Midday UV index
+                        visibility: oneCallRes.data.current.visibility,  // Average visibility, meters
+                        windSpeed: oneCallRes.data.current.wind_speed, // Wind speed
+                        // windGust: oneCallRes.data.current.wind_gust, // (where available) Wind gust. 
+                        windDeg: oneCallRes.data.current.wind_deg, // Wind direction, degrees (meteorological)
+                    }
+
+                    return {
+                            requestTime: getLocalTime(oneCallRes.data.current.dt, timezoneOffset),
+                            unit: unit,
+                            city: capitalize(locationData.city.replace(',', ', ')),
+                            country: locationData.country,
+                            code: oneCallRes.data.current.weather[0].id,
+                            group: getWeatherGroup(oneCallRes.data.current.weather[0].id),
+                            description: capitalize(oneCallRes.data.current.weather[0].description),
+                            temp: oneCallRes.data.current.temp,
+                            furtherCurrentInfo: furtherCurrentInfo,
+                        };
+                };
+            });
+        }).catch(function(err) {
+            if (axios.isCancel(err)) {
+                console.error(err.message, err);
+            } else {
+                debugger;
+                throw err;
+            }
+            debugger;
+            
+        });
 }
 
 export function cancelWeather() {
