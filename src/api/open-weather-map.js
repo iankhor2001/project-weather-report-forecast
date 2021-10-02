@@ -1,13 +1,21 @@
 import axios from 'axios';
 
 const key = 'ecad5734e51e8f8b8441eceb76606453';
-const baseUrl = `http://api.openweathermap.org/data/2.5/weather?appid=${key}`;
+// const baseUrl = `http://api.openweathermap.org/data/2.5/weather?appid=${key}`;
 const baseGeocodingUrl = `http://api.openweathermap.org/geo/1.0/direct?appid=${key}`;
 const baseWeatherUrl = `http://api.openweathermap.org/data/2.5/onecall?appid=${key}`;
 
 const excludeField = ['minutely', 'hourly', 'daily', 'alert']
 
-export function getWeatherGroup(code) {
+function getLocalTime(timestamp, offset=0) {
+    let time = new Date((timestamp+offset)*1000);
+    let hour = time.getUTCHours();
+    let minute = time.getUTCMinutes();
+    let timeInDay = `${hour>10?hour:'0'+hour}:${minute>10?minute:'0'+minute}`;
+    return timeInDay;
+}
+
+function getWeatherGroup(code) {
     let group = 'na';
     if (200 <= code && code < 300) {
         group = 'thunderstorm';
@@ -27,7 +35,7 @@ export function getWeatherGroup(code) {
     return group;
 }
 
-export function capitalize(string) {
+function capitalize(string) {
     return string.replace(/\b\w/g, l => l.toUpperCase());
 }
 
@@ -37,23 +45,22 @@ export function getTodayWeather(city, unit) {
     var geocodingUrl = `${baseGeocodingUrl}&q=${encodeURIComponent(city)}&limit=1`;
     var baseOneCallUrl = `${baseWeatherUrl}&exclude=${excludeField.join(',')}`;
     console.log(`Making request to: ${geocodingUrl}`);
-    var requestTime = new Date().toLocaleTimeString();
 
     return axios.get(geocodingUrl, {cancelToken: weatherSource.token}
-        ).then(function(res) {
-        if (res.data.cod && res.data.message) {
+        ).then(function(geocodingRes) {
+        if (geocodingRes.data.cod && geocodingRes.data.message) {
             debugger;
-            throw new Error(res.data.message);
+            throw new Error(geocodingRes.data.message);
         } else {
             return {
-                lat: res.data[0].lat,
-                lon: res.data[0].lon,
-                country: res.data[0].country
+                lat: geocodingRes.data[0].lat,
+                lon: geocodingRes.data[0].lon,
+                country: geocodingRes.data[0].country
                 }
             }
-        }).then(function(res) {
-            console.log(`Get coordinate successful, requesting ${res.lat},${res.lon}`);
-            const oneCallUrl = `${baseOneCallUrl}&lat=${res.lat}&lon=${res.lon}&unit=${unit}`;
+        }).then(function(locationData) {
+            console.log(`Get coordinate successful, requesting ${locationData.lat},${locationData.lon}`);
+            const oneCallUrl = `${baseOneCallUrl}&lat=${locationData.lat}&lon=${locationData.lon}&units=${unit}`;
             console.log(`Making request to: ${oneCallUrl}`);
             return axios.get(oneCallUrl, {cancelToken: weatherSource.token}).then(function(oneCallRes) {
                 if (oneCallRes.data.cod && oneCallRes.data.message) {
@@ -61,15 +68,32 @@ export function getTodayWeather(city, unit) {
                     throw new Error(oneCallRes.data.message);
                 } else {
                     console.log(oneCallRes)
+                    let timezoneOffset = oneCallRes.data.timezone_offset;
+                    let furtherCurrentInfo = {
+                        sunrise: getLocalTime(oneCallRes.data.current.sunrise, timezoneOffset),
+                        sunset: getLocalTime(oneCallRes.data.current.sunset, timezoneOffset),
+                        feelsLike: oneCallRes.data.current.feels_like,
+                        pressure: oneCallRes.data.current.pressure,  // Atmospheric pressure on the sea level, hPa
+                        humidity: oneCallRes.data.current.humidity,  // %
+                        dewPoint: oneCallRes.data.current.dew_point, // Atmospheric temperature below which water droplets begin to condense
+                        clouds: oneCallRes.data.current.clouds,  // cloudiness, %
+                        uvi: oneCallRes.data.current.uvi,  // Midday UV index
+                        visibility: oneCallRes.data.current.visibility,  // Average visibility, meters
+                        windSpeed: oneCallRes.data.current.wind_speed, // Wind speed
+                        // windGust: oneCallRes.data.current.wind_gust, // (where available) Wind gust. 
+                        windDeg: oneCallRes.data.current.wind_deg, // Wind direction, degrees (meteorological)
+                    }
+
                     return {
-                            requestTime: requestTime,
+                            requestTime: getLocalTime(oneCallRes.data.current.dt, timezoneOffset),
+                            unit: unit,
                             city: capitalize(city.replace(',', ', ')),
-                            country: res.country,
+                            country: locationData.country,
                             code: oneCallRes.data.current.weather[0].id,
                             group: getWeatherGroup(oneCallRes.data.current.weather[0].id),
                             description: capitalize(oneCallRes.data.current.weather[0].description),
                             temp: oneCallRes.data.current.temp,
-                            unit: unit
+                            furtherCurrentInfo: furtherCurrentInfo,
                         };
                 };
             });
@@ -86,9 +110,7 @@ export function getTodayWeather(city, unit) {
 }
 
 export function getGeolocationWeather(lat, lon, unit) {
-    // window.navigator.geolocation.getCurrentPosition((returnPosition)=>{logReturnPositon(returnPosition)}, (err)=>{throw err;});
-    
-    var url = `${baseUrl}&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&units=${unit}`;
+    var url = `${baseWeatherUrl}&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&units=${unit}`;
     var requestTime = new Date().toLocaleTimeString();
     console.log(`Making request to: ${url}`);
 
