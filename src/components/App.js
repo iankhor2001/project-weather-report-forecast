@@ -20,10 +20,17 @@ export class App extends React.Component {
     static getInitWeatherState() { 
         return {
             city: 'na',
+            country: 'na',
             code: -1,
             group: 'na',
             description: 'N/A',
             temp: NaN,
+            requestTime: NaN,
+            furtherCurrentInfo: {
+                sunrise: NaN, sunset: NaN, feelsLike: NaN, pressure: NaN, 
+                humidity: NaN, dewPoint: NaN, clouds: NaN, uvi: NaN, 
+                visibility: NaN, windSpeed: NaN, windGust: NaN, windDeg: NaN,
+            },
         };
     }
 
