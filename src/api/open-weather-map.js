@@ -68,7 +68,7 @@ export function getTodayWeather(city, unit) {
                     debugger;
                     throw new Error(oneCallRes.data.message);
                 } else {
-                    console.log(oneCallRes)
+                    // console.log(oneCallRes)
                     let timezoneOffset = oneCallRes.data.timezone_offset;
                     let furtherCurrentInfo = {
                         sunrise: getLocalTime(oneCallRes.data.current.sunrise, timezoneOffset),
@@ -135,7 +135,7 @@ export function getGeolocationWeather(lat, lon, unit) {
                     debugger;
                     throw new Error(oneCallRes.data.message);
                 } else {
-                    console.log(oneCallRes)
+                    // console.log(oneCallRes)
                     let timezoneOffset = oneCallRes.data.timezone_offset;
                     let furtherCurrentInfo = {
                         sunrise: getLocalTime(oneCallRes.data.current.sunrise, timezoneOffset),
