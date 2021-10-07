@@ -57,18 +57,28 @@ export default class TodayWeatherDisplay extends React.Component {
                     </Card.Header>
                     <Card.Body className='mx-5 pt-0'>
                         <Row>
-                            <WeatherDisplayCol title="Sunrise" infoUnit="" value={this.props.furtherCurrentInfo.sunrise} />
-                            <WeatherDisplayCol title="Sunset" infoUnit="" value={this.props.furtherCurrentInfo.sunset} />
-                            <WeatherDisplayCol title="Feels Like" infoUnit={(this.props.unit === 'metric') ? '\xBAC' : '\xBAF'}
+                            <WeatherDisplayCol title="Sunrise"      icon="sunrise"  infoUnit=""     value={this.props.furtherCurrentInfo.sunrise}/>
+                            <WeatherDisplayCol title="Sunset"       icon="sunset"  infoUnit=""     value={this.props.furtherCurrentInfo.sunset}/>
+                            <WeatherDisplayCol title="Feels Like"   icon="thermometer"  infoUnit={(this.props.unit === 'metric') ? '\xBAC' : '\xBAF'}
                                 value={this.props.furtherCurrentInfo.feelsLike} />
-                            <WeatherDisplayCol title="Pressure" infoUnit="hPa" value={this.props.furtherCurrentInfo.pressure} />
-                            <WeatherDisplayCol title="Humidity" infoUnit="%" value={this.props.furtherCurrentInfo.humidity} />
-                            <WeatherDisplayCol title="Dew Point" infoUnit={(this.props.unit === 'metric') ? '\xBAC' : '\xBAF'} 
+                            <WeatherDisplayCol title="Pressure"     icon="barometer"  infoUnit="hPa"  value={this.props.furtherCurrentInfo.pressure}/>
+                            <WeatherDisplayCol title="Humidity"     icon="humidity"  infoUnit="%"    value={this.props.furtherCurrentInfo.humidity}/>
+                            <WeatherDisplayCol title="Dew Point"    icon="raindrops"  infoUnit={(this.props.unit === 'metric') ? '\xBAC' : '\xBAF'} 
                                 value={this.props.furtherCurrentInfo.dewPoint} />
-                            <WeatherDisplayCol title="Cloudiness" infoUnit="%" value={this.props.furtherCurrentInfo.clouds} />
-                            <WeatherDisplayCol title="UV Index" infoUnit="" value={this.props.furtherCurrentInfo.uvi} />
-                            <WeatherDisplayCol title="Visibility" infoUnit="m" value={this.props.furtherCurrentInfo.visibility} />
-                            {/* TODO: wind speed + deg */}
+                            <WeatherDisplayCol title="Cloudiness"   icon="cloudy"  infoUnit="%"    value={this.props.furtherCurrentInfo.clouds}/>
+                            <WeatherDisplayCol title="UV Index"     icon="day-sunny"  infoUnit=""     value={this.props.furtherCurrentInfo.uvi}/>
+                            <WeatherDisplayCol title="Visibility"   icon="smog"  infoUnit="m"    value={this.props.furtherCurrentInfo.visibility}/>
+                            {/* Wind speed + deg */}
+                            <Col sm={6} as='h5' className="px-2 my-2">
+                                <div className="d-flex">
+                                    <i className={`wi wi-fw wi-strong-wind wi-custom`}></i>
+                                    <div className="ms-1 me-auto">Wind</div>
+                                    <div className="ms-1 ms-auto">
+                                        <i className={`wi wi-custom wi-fw wi-wind towards-${this.props.furtherCurrentInfo.windDeg}-deg`}></i>
+                                        {this.props.furtherCurrentInfo.windSpeed} {(this.props.unit === 'metric') ? 'm/s' : 'mph'}
+                                    </div>
+                                </div>
+                            </Col>
                         </Row>
                     </Card.Body>
                 </Card>
@@ -80,13 +90,12 @@ export default class TodayWeatherDisplay extends React.Component {
 
 function WeatherDisplayCol(props) {
     return (
-        <Col sm={6} as='h5' className="px-3 my-2">
+        <Col sm={6} as='h5' className="px-2 my-2">
             <div className="d-flex">
-                <i className="">@&nbsp;</i>
-                <div className="me-auto">{props.title}</div>
-                <div className="ms-auto">{props.value} {props.infoUnit}</div>
+                <i className={`wi wi-fw wi-${props.icon} wi-custom`}></i>
+                <div className="ms-1 me-auto">{props.title}</div>
+                <div className="ms-1 ms-auto">{props.value} {props.infoUnit}</div>
             </div>
-            
         </Col>
     );
 }
