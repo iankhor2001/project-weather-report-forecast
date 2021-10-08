@@ -69,33 +69,12 @@ export function getTodayWeather(city, unit) {
                     throw new Error(oneCallRes.data.message);
                 } else {
                     // console.log(oneCallRes)
-                    let timezoneOffset = oneCallRes.data.timezone_offset;
-                    let furtherCurrentInfo = {
-                        sunrise: getLocalTime(oneCallRes.data.current.sunrise, timezoneOffset),
-                        sunset: getLocalTime(oneCallRes.data.current.sunset, timezoneOffset),
-                        feelsLike: oneCallRes.data.current.feels_like,
-                        pressure: oneCallRes.data.current.pressure,  // Atmospheric pressure on the sea level, hPa
-                        humidity: oneCallRes.data.current.humidity,  // %
-                        dewPoint: oneCallRes.data.current.dew_point, // Atmospheric temperature below which water droplets begin to condense
-                        clouds: oneCallRes.data.current.clouds,  // cloudiness, %
-                        uvi: oneCallRes.data.current.uvi,  // Midday UV index
-                        visibility: oneCallRes.data.current.visibility,  // Average visibility, meters
-                        windSpeed: oneCallRes.data.current.wind_speed, // Wind speed
-                        // windGust: oneCallRes.data.current.wind_gust, // (where available) Wind gust. 
-                        windDeg: oneCallRes.data.current.wind_deg, // Wind direction, degrees (meteorological)
-                    }
-
                     return {
-                            requestTime: getLocalTime(oneCallRes.data.current.dt, timezoneOffset),
-                            unit: unit,
-                            city: capitalize(city.replace(',', ', ')),
-                            country: locationData.country,
-                            code: oneCallRes.data.current.weather[0].id,
-                            group: getWeatherGroup(oneCallRes.data.current.weather[0].id),
-                            description: capitalize(oneCallRes.data.current.weather[0].description),
-                            temp: oneCallRes.data.current.temp,
-                            furtherCurrentInfo: furtherCurrentInfo,
-                        };
+                        unit: unit,
+                        city: capitalize(city.replace(',', ', ')),
+                        country: locationData.country,
+                        ...handleWeatherInformation(oneCallRes.data)
+                    };
                 };
             });
         }).catch(function(err) {
@@ -135,33 +114,11 @@ export function getGeolocationWeather(lat, lon, unit) {
                     debugger;
                     throw new Error(oneCallRes.data.message);
                 } else {
-                    // console.log(oneCallRes)
-                    let timezoneOffset = oneCallRes.data.timezone_offset;
-                    let furtherCurrentInfo = {
-                        sunrise: getLocalTime(oneCallRes.data.current.sunrise, timezoneOffset),
-                        sunset: getLocalTime(oneCallRes.data.current.sunset, timezoneOffset),
-                        feelsLike: oneCallRes.data.current.feels_like,
-                        pressure: oneCallRes.data.current.pressure,  // Atmospheric pressure on the sea level, hPa
-                        humidity: oneCallRes.data.current.humidity,  // %
-                        dewPoint: oneCallRes.data.current.dew_point, // Atmospheric temperature below which water droplets begin to condense
-                        clouds: oneCallRes.data.current.clouds,  // cloudiness, %
-                        uvi: oneCallRes.data.current.uvi,  // Midday UV index
-                        visibility: oneCallRes.data.current.visibility,  // Average visibility, meters
-                        windSpeed: oneCallRes.data.current.wind_speed, // Wind speed
-                        // windGust: oneCallRes.data.current.wind_gust, // (where available) Wind gust. 
-                        windDeg: oneCallRes.data.current.wind_deg, // Wind direction, degrees (meteorological)
-                    }
-
                     return {
-                            requestTime: getLocalTime(oneCallRes.data.current.dt, timezoneOffset),
                             unit: unit,
                             city: capitalize(locationData.city.replace(',', ', ')),
                             country: locationData.country,
-                            code: oneCallRes.data.current.weather[0].id,
-                            group: getWeatherGroup(oneCallRes.data.current.weather[0].id),
-                            description: capitalize(oneCallRes.data.current.weather[0].description),
-                            temp: oneCallRes.data.current.temp,
-                            furtherCurrentInfo: furtherCurrentInfo,
+                            ...handleWeatherInformation(oneCallRes.data)
                         };
                 };
             });
@@ -181,10 +138,32 @@ export function cancelWeather() {
     weatherSource.cancel('Request canceled');
 }
 
-// export function getForecast(city, unit) {
-//     // TODO
-// }
-
-// export function cancelForecast() {
-//     // TODO
-// }
+function handleWeatherInformation(weatherInfo) {
+    // console.log(oneCallRes)
+    let currentInfo = weatherInfo.current;
+    let timezoneOffset = weatherInfo.timezone_offset;
+    let furtherCurrentInfo = {
+        sunrise: getLocalTime(currentInfo.sunrise, timezoneOffset),
+        sunset: getLocalTime(currentInfo.sunset, timezoneOffset),
+        feelsLike: currentInfo.feels_like,
+        pressure: currentInfo.pressure,  // Atmospheric pressure on the sea level, hPa
+        humidity: currentInfo.humidity,  // %
+        dewPoint: currentInfo.dew_point, // Atmospheric temperature below which water droplets begin to condense
+        clouds: currentInfo.clouds,  // cloudiness, %
+        uvi: currentInfo.uvi,  // Midday UV index
+        visibility: currentInfo.visibility,  // Average visibility, meters
+        windSpeed: currentInfo.wind_speed, // Wind speed
+        // windGust: currentInfo.wind_gust, // (where available) Wind gust. 
+        windDeg: currentInfo.wind_deg, // Wind direction, degrees (meteorological)
+    }
+    let isDayTime = currentInfo.dt<=currentInfo.sunset && currentInfo.dt>currentInfo.sunrise;
+    return {
+        isDayTime: isDayTime,
+        requestTime: getLocalTime(currentInfo.dt, timezoneOffset),
+        code: currentInfo.weather[0].id,
+        group: getWeatherGroup(currentInfo.weather[0].id),
+        description: capitalize(currentInfo.weather[0].description),
+        temp: currentInfo.temp,
+        furtherCurrentInfo: furtherCurrentInfo,
+    };
+}
